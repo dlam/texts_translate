@@ -5,23 +5,19 @@ function saveLocale(context) {
 
     var localeContext = getLocaleContext(context)
 
-    if (localeContext['folder_path'])
-    {
-        if (!localeContext['current_locale'])
-        {
+    if (localeContext['folder_path']) {
+        if (!localeContext['current_locale']) {
             newLocaleByUser = getNewLocaleByUser()
-            if(newLocaleByUser)
-            {
+            if (newLocaleByUser) {
                 localeContext['current_locale'] = newLocaleByUser
                 saveConfigFile(localeContext)
             }
         }
 
-        if(localeContext['current_locale'])
-        {
+        if (localeContext['current_locale']) {
             var textLayersContent = getTextLayersContent(context)
-            if(saveLocaleToFile(localeContext,textLayersContent))
-                context.document.showMessage("'" + localeContext['current_locale']+"' locale saved.")
+            if (saveLocaleToFile(localeContext, textLayersContent))
+                context.document.showMessage("'" + localeContext['current_locale'] + "' locale saved.")
         }
     }
 
@@ -34,38 +30,37 @@ function changeLocale(context) {
 
     localeContext = getLocaleContext(context)
 
-    if(localeContext['folder_path'])
-    {
+    if (localeContext['folder_path']) {
         var window = NSWindow.alloc().init()
         window.setTitle("Change locale")
-        [window setFrame:NSMakeRect(0, 0, 600, 170) display:false]
+        [window setFrame: NSMakeRect(0, 0, 600, 170) display: false]
 
         var promptField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)]
-        [promptField setEditable:false]
-        [promptField setBordered:false]
-        [promptField setDrawsBackground:false]
-        [promptField setStringValue:"Select locale from list or create a new one:"]
-        [promptField sizeToFit]
+        [promptField setEditable: false]
+            [promptField setBordered:false]
+            [promptField setDrawsBackground:false]
+            [promptField setStringValue:"Select locale from list or create a new one:"]
+            [promptField sizeToFit]
         [promptField setFrame:NSMakeRect(20, 100, [promptField frame].size.width, [promptField frame].size.height)]
-        [[window contentView] addSubview:promptField]
+        [[window contentView] addSubview: promptField]
 
         var inputField = [[NSComboBox alloc] initWithFrame:NSMakeRect([promptField frame].size.width + 30, 95, 180, 25)]
-        [inputField addItemsWithObjectValues:localeContext['locales']]
-        [inputField setEditable:false]
-        [[window contentView] addSubview:inputField]
-        if(localeContext['current_locale'])
+        [inputField addItemsWithObjectValues: localeContext['locales']]
+            [inputField setEditable:false]
+            [[window contentView] addSubview:inputField]
+        if (localeContext['current_locale'])
             inputField.selectItemWithObjectValue(localeContext['current_locale'])
 
         var okButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)]
-        [okButton setTitle:"  Change  "]
-        [okButton setBezelStyle:NSRoundedBezelStyle]
+        [okButton setTitle: "  Change  "]
+            [okButton setBezelStyle:NSRoundedBezelStyle]
         [okButton sizeToFit]
-        [okButton setFrame:NSMakeRect([window frame].size.width - [okButton frame].size.width - 20, 14, [okButton frame].size.width, [okButton frame].size.height)]
+        [okButton setFrame: NSMakeRect([window frame].size.width - [okButton frame].size.width - 20, 14, [okButton frame].size.width, [okButton frame].size.height)]
         [okButton setKeyEquivalent:"\r"] // return key
-        [okButton setCOSJSTargetFunction:function(sender) {
-            if(updateTextsLayersFromLocale(context, localeContext, inputField.stringValue())) {
-                context.document.showMessage("Changed to locale '"+localeContext['current_locale']+"'.")
-                [window orderOut:nil]
+        [okButton setCOSJSTargetFunction: function(sender) {
+            if (updateTextsLayersFromLocale(context, localeContext, inputField.stringValue())) {
+                context.document.showMessage("Changed to locale '" + localeContext['current_locale'] + "'.")
+                [window orderOut: nil]
                 [NSApp stopModal]
             } else {
                 context.document.showMessage('It has been an error, please try again.')
@@ -74,64 +69,64 @@ function changeLocale(context) {
         [[window contentView] addSubview:okButton]
 
         var cancelButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)]
-        [cancelButton setTitle:"  Cancel  "]
-        [cancelButton setBezelStyle:NSRoundedBezelStyle]
+        [cancelButton setTitle: "  Cancel  "]
+            [cancelButton setBezelStyle:NSRoundedBezelStyle]
         [cancelButton sizeToFit]
-        [cancelButton setFrame:NSMakeRect([okButton frame].origin.x - [cancelButton frame].size.width, 14, [cancelButton frame].size.width, [cancelButton frame].size.height)]
+        [cancelButton setFrame: NSMakeRect([okButton frame].origin.x - [cancelButton frame].size.width, 14, [cancelButton frame].size.width, [cancelButton frame].size.height)]
         [cancelButton setKeyEquivalent:@"\033"] // escape key
-        [cancelButton setCOSJSTargetFunction:function(sender) {
+        [cancelButton setCOSJSTargetFunction:function (sender) {
             [window orderOut:nil]
             [NSApp stopModal]
-        }]
-        [[window contentView] addSubview:cancelButton]
+    }]
+    [[window contentView] addSubview:cancelButton]
 
-        var newLocaleButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)]
-        [newLocaleButton setTitle:"  Add new locale  "]
+    var newLocaleButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)]
+    [newLocaleButton setTitle: "  Add new locale  "]
         [newLocaleButton setBezelStyle:NSRoundedBezelStyle]
-        [newLocaleButton sizeToFit]
-        [newLocaleButton setFrame:NSMakeRect(20, [okButton frame].size.height + 14, 560, [newLocaleButton frame].size.height)]
-        [newLocaleButton setCOSJSTargetFunction:function(sender) {
-            var newLocaleName = getNewLocaleByUser()
-            if(newLocaleName){
-                localeContext['current_locale'] = newLocaleName
-                saveConfigFile(localeContext)
-                var textLayersContent = getTextLayersContent(context)
-                if(saveLocaleToFile(localeContext,textLayersContent)) {
-                    context.document.showMessage("'"+localeContext['current_locale']+"' locale created.")
-                    [window orderOut:nil]
-                    [NSApp stopModal]
-                }
+    [newLocaleButton sizeToFit]
+    [newLocaleButton setFrame: NSMakeRect(20, [okButton frame].size.height + 14, 560, [newLocaleButton frame].size.height)]
+    [newLocaleButton setCOSJSTargetFunction:function (sender) {
+        var newLocaleName = getNewLocaleByUser()
+        if (newLocaleName) {
+            localeContext['current_locale'] = newLocaleName
+            saveConfigFile(localeContext)
+            var textLayersContent = getTextLayersContent(context)
+            if (saveLocaleToFile(localeContext, textLayersContent)) {
+                context.document.showMessage("'" + localeContext['current_locale'] + "' locale created.")
+                [window orderOut: nil]
+    [NSApp stopModal]
+}
             }
         }]
-        [[window contentView] addSubview:newLocaleButton]
+[[window contentView] addSubview:newLocaleButton]
 
-        var saveLocaleButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)]
-        var saveLocaleButtonTitle = '  Save current locale  '
-        if(localeContext['current_locale'])
-            saveLocaleButtonTitle = "  Save current locale '" + localeContext['current_locale'] + "'  "
-        [saveLocaleButton setTitle:saveLocaleButtonTitle]
-        [saveLocaleButton setBezelStyle:NSRoundedBezelStyle]
-        [saveLocaleButton sizeToFit]
-        [saveLocaleButton setFrame:NSMakeRect(20, 14, [saveLocaleButton frame].size.width, [saveLocaleButton frame].size.height)]
-        [saveLocaleButton setCOSJSTargetFunction:function(sender) {
-            saveLocale(context)
-        }]
-        [[window contentView] addSubview:saveLocaleButton]
+var saveLocaleButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)]
+var saveLocaleButtonTitle = '  Save current locale  '
+if (localeContext['current_locale'])
+    saveLocaleButtonTitle = "  Save current locale '" + localeContext['current_locale'] + "'  "
+    [saveLocaleButton setTitle: saveLocaleButtonTitle]
+[saveLocaleButton setBezelStyle:NSRoundedBezelStyle]
+[saveLocaleButton sizeToFit]
+[saveLocaleButton setFrame:NSMakeRect(20, 14, [saveLocaleButton frame].size.width, [saveLocaleButton frame].size.height)]
+[saveLocaleButton setCOSJSTargetFunction: function(sender) {
+    saveLocale(context)
+}]
+[[window contentView] addSubview:saveLocaleButton]
 
-        [NSApp runModalForWindow:window]
+[NSApp runModalForWindow: window]
 
     }
 }
 
 function saveConfigFile(localeContext) {
     var currentLocaleFile = localeContext['current_locale']
-    if(![[NSString stringWithFormat:currentLocaleFile] writeToFile:localeContext['config_file_path'] atomically:'YES' encoding:NSUTF8StringEncoding error:'NULL'])
+    if (![[NSString stringWithFormat:currentLocaleFile] writeToFile:localeContext['config_file_path'] atomically:'YES' encoding:NSUTF8StringEncoding error:'NULL'])
         context.document.showMessage('It has been an error when saving config file.')
 }
 
 function getLocaleTextFromFile(localeContext, locale) {
 
-    var file = localeContext['folder_path']+locale+'.json'
+    var file = localeContext['folder_path'] + locale + '.json'
     var fileContent = [NSString stringWithContentsOfFile:file encoding:NSUTF8StringEncoding error:'NULL']
     var arrayContent = JSON.parse(fileContent, undefined, 2)
 
@@ -139,36 +134,34 @@ function getLocaleTextFromFile(localeContext, locale) {
 
 }
 
-function saveLocaleToFile(localeContext,textLayersContent) {
+function saveLocaleToFile(localeContext, textLayersContent) {
 
     var currentLocaleContent = JSON.stringify(textLayersContent, undefined, 2)
-    var currentLocaleFilePath = localeContext['folder_path']+localeContext['current_locale']+'.json'
-    if([[NSString stringWithFormat:currentLocaleContent] writeToFile:currentLocaleFilePath atomically:'YES' encoding:NSUTF8StringEncoding error:'NULL'])
+    var currentLocaleFilePath = localeContext['folder_path'] + localeContext['current_locale'] + '.json'
+    if ([[NSString stringWithFormat:currentLocaleContent] writeToFile:currentLocaleFilePath atomically:'YES' encoding:NSUTF8StringEncoding error:'NULL'])
         return true
     else
         return false
 
 }
 
-function updateTextsLayersFromLocale(context,localeContext,selected_locale) {
+function updateTextsLayersFromLocale(context, localeContext, selected_locale) {
 
     var document = context.document
 
-    if( localeIsAvailable(localeContext,selected_locale) ) {
-        var localeText = getLocaleTextFromFile(localeContext,selected_locale)
+    if (localeIsAvailable(localeContext, selected_locale)) {
+        var localeText = getLocaleTextFromFile(localeContext, selected_locale)
 
         var pages = document.pages()
         for (var i = 0; i < pages.count(); i++) {
             var layers = pages[i].children()
             for (var j = 0; j < layers.count(); j++) {
-                if(layers[j].class() === MSTextLayer)
-                {
+                if (layers[j].class() === MSTextLayer) {
                     key_string = unescape(layers[j].objectID())
                     value_string = unescape(layers[j].stringValue())
                     for (var located_key in localeText) {
                         located_value = localeText[located_key]
-                        if(key_string == located_key)
-                        {
+                        if (key_string == located_key) {
                             layers[j].setStringValue(located_value)
                         }
                     }
@@ -184,23 +177,23 @@ function updateTextsLayersFromLocale(context,localeContext,selected_locale) {
     }
 }
 
-function localeIsAvailable(localeContext,selected_locale) {
+function localeIsAvailable(localeContext, selected_locale) {
 
     var response = false
 
     for (var i = 0; i < localeContext['locales'].length; i++) {
-        if(String(localeContext['locales'][i]) == String(selected_locale))
+        if (String(localeContext['locales'][i]) == String(selected_locale))
             response = true
     }
     return response
 }
 
-function getNewLocaleByUser(){
+function getNewLocaleByUser() {
 
     var response = null
 
-    var accessory = NSView.alloc().initWithFrame(NSMakeRect(0,0,300,50))
-    var input = NSTextField.alloc().initWithFrame(NSMakeRect(0,25,300,25))
+    var accessory = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 300, 50))
+    var input = NSTextField.alloc().initWithFrame(NSMakeRect(0, 25, 300, 25))
     input.editable = true
     accessory.addSubview(input)
     var alert = NSAlert.alloc().init()
@@ -213,8 +206,8 @@ function getNewLocaleByUser(){
     var responseCode = alert.runModal()
     var selected_locale_input = input.stringValue()
 
-    if(responseCode==1000 && selected_locale_input!='')
-      response = selected_locale_input
+    if (responseCode == 1000 && selected_locale_input != '')
+        response = selected_locale_input
 
     return response
 
@@ -229,8 +222,7 @@ function getTextLayersContent(context) {
     for (var i = 0; i < pages.count(); i++) {
         var layers = pages[i].children()
         for (var j = 0; j < layers.count(); j++) {
-            if(layers[j].class() === MSTextLayer)
-            {
+            if (layers[j].class() === MSTextLayer) {
                 key_string = unescape(layers[j].objectID())
                 value_string = unescape(layers[j].stringValue())
                 textLayerContent[key_string] = value_string
@@ -253,48 +245,45 @@ function getLocaleContext(context) {
     localeContext['current_locale'] = null
 
     // Check if document is saved
-    if ( document.fileURL() == null )
+    if (document.fileURL() == null)
         [app displayDialog:'You need to save the document in your computer in order to save texts translations.' withTitle:'Document required']
     else {
         var documentName = document.displayName()
-        var documentFolderPath = decodeURIComponent(document.fileURL()).replace('file://','').replace(documentName,'').replace('.sketch','')
-        var translationsFolderName = documentName.replace('.sketch','')+'_translations'
-        var translationsFolderPath = documentFolderPath+translationsFolderName+'/'
+        var documentFolderPath = decodeURIComponent(document.fileURL()).replace('file://', '').replace(documentName, '').replace('.sketch', '')
+        var translationsFolderName = documentName.replace('.sketch', '') + '_translations'
+        var translationsFolderPath = documentFolderPath + translationsFolderName + '/'
 
         var fileManager = [NSFileManager defaultManager]
 
         // Create translations folder if does not exists
-        if([fileManager fileExistsAtPath:translationsFolderPath]){
-          // translation folder exists
-        }else{
-          if([fileManager createDirectoryAtPath:translationsFolderPath withIntermediateDirectories:'YES' attributes:nil error:nil])
-          {
-            context.document.showMessage('Translations folder created.')
-          }else {
-            [app displayDialog:'It has been an error when creating translations folder.' withTitle:'Error']
-          }
+        if ([fileManager fileExistsAtPath:translationsFolderPath]) {
+            // translation folder exists
+        } else {
+            if ([fileManager createDirectoryAtPath:translationsFolderPath withIntermediateDirectories:'YES' attributes:nil error:nil]) {
+                context.document.showMessage('Translations folder created.')
+            } else {
+                [app displayDialog:'It has been an error when creating translations folder.' withTitle:'Error']
+            }
 
         }
 
         // Check translations folder
-        if([fileManager fileExistsAtPath:translationsFolderPath])
-        {
+        if ([fileManager fileExistsAtPath:translationsFolderPath]) {
             localeContext['folder_path'] = translationsFolderPath
 
             // Check if config file (with current_locale) exists
-            localeContext['config_file_path'] = translationsFolderPath+'.config'
-            if([fileManager fileExistsAtPath:localeContext['config_file_path']])
+            localeContext['config_file_path'] = translationsFolderPath + '.config'
+            if ([fileManager fileExistsAtPath:localeContext['config_file_path']])
                 var configFileContent = [NSString stringWithContentsOfFile:localeContext['config_file_path'] encoding:NSUTF8StringEncoding error:'NULL']
 
             // Check translations folder files
             var dirContents = [fileManager contentsOfDirectoryAtPath:translationsFolderPath error:nil]
 
-            for(var i = 0; i < dirContents.count(); i++)
-                if(dirContents[i].includes(".json"))
-                {
-                    locale = dirContents[i].replace('.json','')
+            for (var i = 0; i < dirContents.count(); i++)
+                if (dirContents[i].includes(".json")) {
+                    locale = dirContents[i].replace('.json', '')
                     localeContext['locales'].push(locale)
-                    if(String(configFileContent) == String(locale))
+                    if (String(configFileContent) == String(locale))
                         localeContext['current_locale'] = locale
                 }
 
@@ -302,4 +291,73 @@ function getLocaleContext(context) {
     }
     return localeContext
 
+}
+
+function selectFolder() {
+    //open a window to select a folder to save to
+    var panel = [NSOpenPanel openPanel];
+    [panel setCanChooseDirectories:true];
+    [panel setCanCreateDirectories:true];
+
+    //checks if user clicks open in window
+    var clicked = [panel runModal];
+    if (clicked == NSFileHandlingPanelOKButton) {
+
+        var isDirectory = true;
+        var firstURL = [[panel URLs] objectAtIndex:0];
+        var unformattedURL = [NSString stringWithFormat:@"%@", firstURL];
+
+        //makes sure spaces aren't formatted to %20
+        var file_path = [unformattedURL stringByRemovingPercentEncoding];
+
+        //removes file:// from path
+        if (0 === file_path.indexOf("file://")) {
+            file_path = file_path.substring(7);
+            return file_path;
+        }
+    }
+}
+
+function save_android(context) {
+    var localeContext = getLocaleContext(context);
+    var doc = context.document;
+    var selection = context.selection;
+    var file_path = selectFolder();
+
+    localeContext['locales'].forEach(function (currentLocale) {
+        if (updateTextsLayersFromLocale(context, localeContext, currentLocale)) {
+            context.document.showMessage("Changed to locale '" + currentLocale + "'.")
+            save(selection, file_path, doc, currentLocale, 0.75, 'ldpi', 'android');
+            save(selection, file_path, doc, currentLocale, 1, 'mdpi', 'android');
+            save(selection, file_path, doc, currentLocale, 1, 'hdpi', 'android');
+            save(selection, file_path, doc, currentLocale, 2, 'xhdpi', 'android');
+            save(selection, file_path, doc, currentLocale, 3, 'xxhdpi', 'android');
+            save(selection, file_path, doc, currentLocale, 4, 'xxxhdpi', 'android');
+        } else {
+            context.document.showMessage('It has been an error, please try again.')
+        }
+    });
+}
+
+function save(selection, file_path, doc, localeName, scale, scaleName, platform) {
+    for (var i = 0; i < selection.count(); i++) {
+        var s = selection[i];
+        var sName = s.name();
+        var fileNames = [];
+
+        var c = s.duplicate();
+        c.exportOptions().removeAllExportFormats();
+        var exportOption = c.exportOptions().addExportFormat();
+        exportOption.setScale(scale);
+        exportOption.setName("@" + scale + "x");
+
+        var fileName = file_path + "/" + platform + "_" + sName + "_" + scaleName + "_" + localeName + ".png";
+        fileNames.push(fileName);
+
+        var slices = MSExportRequest.exportRequestsFromExportableLayer(c);
+        for (var j = 0; j < slices.count(); j++) {
+            [doc saveArtboardOrSlice:slices[j] toFile:fileNames[j]];
+        }
+        c.removeFromParent();
+    }
 }

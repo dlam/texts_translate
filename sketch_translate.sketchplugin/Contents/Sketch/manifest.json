@@ -19,6 +19,11 @@
       "script" : "text-translation.js",
       "handler" : "saveLocale",
       "shortcut" : ""
+    },{
+      "name" : "Export All Locales - Android",
+      "identifier" : "save_android",
+      "script" : "text-translation.js",
+      "handler" : "save_android"
     }
   ]
 }
