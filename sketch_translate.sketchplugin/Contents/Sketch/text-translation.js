@@ -339,7 +339,29 @@ function save_android(context) {
     });
 }
 
+function save_ios(context) {
+    var localeContext = getLocaleContext(context);
+    var doc = context.document;
+    var selection = context.selection;
+    var file_path = selectFolder();
+
+    localeContext['locales'].forEach(function (currentLocale) {
+        if (updateTextsLayersFromLocale(context, localeContext, currentLocale)) {
+            context.document.showMessage("Changed to locale '" + currentLocale + "'.")
+            save(selection, file_path, doc, currentLocale, 1, '@1x', 'android');
+            save(selection, file_path, doc, currentLocale, 2, '@2x', 'android');
+            save(selection, file_path, doc, currentLocale, 3, '@3x', 'android');
+        } else {
+            context.document.showMessage('It has been an error, please try again.')
+        }
+    });
+}
+
 function save(selection, file_path, doc, localeName, scale, scaleName, platform) {
+    if (localeName == 'key_mapping') {
+      return;
+    }
+
     for (var i = 0; i < selection.count(); i++) {
         var s = selection[i];
         var sName = s.name();
@@ -351,7 +373,7 @@ function save(selection, file_path, doc, localeName, scale, scaleName, platform)
         exportOption.setScale(scale);
         exportOption.setName("@" + scale + "x");
 
-        var fileName = file_path + "/" + platform + "_" + sName + "_" + scaleName + "_" + localeName + ".png";
+        var fileName = file_path + "/" + platform + "_" + sName + "_" + scaleName + "_" + localeName + "_0.png";
         fileNames.push(fileName);
 
         var slices = MSExportRequest.exportRequestsFromExportableLayer(c);

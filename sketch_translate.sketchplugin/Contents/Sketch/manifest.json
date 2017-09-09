@@ -24,6 +24,11 @@
       "identifier" : "save_android",
       "script" : "text-translation.js",
       "handler" : "save_android"
+    },{
+      "name" : "Export All Locales - iOS",
+      "identifier" : "save_ios",
+      "script" : "text-translation.js",
+      "handler" : "save_ios"
     }
   ]
 }

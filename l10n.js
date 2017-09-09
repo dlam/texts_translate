@@ -8,7 +8,7 @@ if (sketchFileName == null) {
 }
 
 const fs = require('fs');
-const keyMapping = JSON.parse(fs.readFileSync(sketchFileName + '_translations/key_mapping.json', 'utf8'));
+const keyMapping = JSON.parse(fs.readFileSync('./' + sketchFileName + '_translations/key_mapping.json', 'utf8'));
 
 fs.readdir('Plaza', function(err, files) {
   if (err) {
@@ -18,7 +18,7 @@ fs.readdir('Plaza', function(err, files) {
 
   files.forEach(function(file, index) {
     const newTranslation = {};
-    const translations = JSON.parse(fs.readFileSync('Plaza/' + file, 'utf8'));
+    const translations = JSON.parse(fs.readFileSync('./Plaza/' + file, 'utf8'));
     for (const key in keyMapping) {
       const value = keyMapping[key];
       if (value.toLowerCase() == value && value.indexOf(' ') < 0 && translations.hasOwnProperty(value)) {
@@ -27,7 +27,7 @@ fs.readdir('Plaza', function(err, files) {
         newTranslation[key] = value;
       }
 
-      fs.writeFile(sketchFileName + '_translations/' + file, JSON.stringify(newTranslation, null, 2), 'utf-8', (error) => {
+      fs.writeFile('./' + sketchFileName + '_translations/' + file, JSON.stringify(newTranslation, null, 2), 'utf-8', (error) => {
         console.error("Error writing file.", error);
         process.exit(1);
       });
