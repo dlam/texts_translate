@@ -348,9 +348,9 @@ function save_ios(context) {
     localeContext['locales'].forEach(function (currentLocale) {
         if (updateTextsLayersFromLocale(context, localeContext, currentLocale)) {
             context.document.showMessage("Changed to locale '" + currentLocale + "'.")
-            save(selection, file_path, doc, currentLocale, 1, '@1x', 'android');
-            save(selection, file_path, doc, currentLocale, 2, '@2x', 'android');
-            save(selection, file_path, doc, currentLocale, 3, '@3x', 'android');
+            save(selection, file_path, doc, currentLocale, 1, '@1x', 'ios');
+            save(selection, file_path, doc, currentLocale, 2, '@2x', 'ios');
+            save(selection, file_path, doc, currentLocale, 3, '@3x', 'ios');
         } else {
             context.document.showMessage('It has been an error, please try again.')
         }
